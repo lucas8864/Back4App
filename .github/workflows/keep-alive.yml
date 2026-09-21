@@ -1,0 +1,38 @@
+
+name: Back4App Keep Alive
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Ping Back4App containers
+        run: |
+          set +e
+
+          urls=(
+            "https://nodewslite-w67v5892.b4a.run/"
+            "https://lalucas-ch5011h3.b4a.run/"
+          )
+
+          for url in "${urls[@]}"; do
+            echo "访问: $url"
+
+            curl -sS -L \
+              --connect-timeout 10 \
+              --max-time 30 \
+              -o /dev/null \
+              -w "HTTP 状态码: %{http_code}\n" \
+              "$url"
+
+            echo "-------------------------"
+          done
