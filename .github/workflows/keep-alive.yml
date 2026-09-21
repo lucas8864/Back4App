@@ -1,9 +1,8 @@
-
 name: Back4App Keep Alive
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "3,13,23,33,43,53 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,24 +14,24 @@ jobs:
     timeout-minutes: 2
 
     steps:
-      - name: Ping Back4App containers
+      - name: Ping node-ws-lite
         run: |
-          set +e
-
-          urls=(
+          echo "Pinging node-ws-lite..."
+          curl -L \
+            --connect-timeout 10 \
+            --max-time 30 \
+            -sS \
+            -o /dev/null \
+            -w "node-ws-lite: HTTP %{http_code}\n" \
             "https://nodewslite-w67v5892.b4a.run/"
+
+      - name: Ping lalucas
+        run: |
+          echo "Pinging lalucas..."
+          curl -L \
+            --connect-timeout 10 \
+            --max-time 30 \
+            -sS \
+            -o /dev/null \
+            -w "lalucas: HTTP %{http_code}\n" \
             "https://lalucas-ch5011h3.b4a.run/"
-          )
-
-          for url in "${urls[@]}"; do
-            echo "访问: $url"
-
-            curl -sS -L \
-              --connect-timeout 10 \
-              --max-time 30 \
-              -o /dev/null \
-              -w "HTTP 状态码: %{http_code}\n" \
-              "$url"
-
-            echo "-------------------------"
-          done
